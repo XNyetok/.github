@@ -315,6 +315,7 @@ def button(t, label, primary=False):
 ASSETS = {
     "banner": banner,
     "btn-havus": lambda t: button(t, "Try Havus", primary=True),
+    "btn-korupsi": lambda t: button(t, "Play Korupsi"),
     "btn-support": lambda t: button(t, "Support Nyetok"),
 }
 
