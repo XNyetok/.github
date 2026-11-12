@@ -146,6 +146,13 @@ def plate(t, x, y, w, label, dashed=False):
                    cls="mono", spacing=1.6, anchor="middle"))
 
 
+def label_plate(t, x, top, w, h, label):
+    """The label on a box's front: centered in a tall box, nudged left of the logo in a short one."""
+    if h >= 56:
+        return plate(t, x + 18, top + 22, w - 36, label)
+    return plate(t, x + 11, top + 15, w - 40, label)
+
+
 def closed_box(t, x, floor, w, h, label):
     """A taped box seen from a little above, stamped with the Nyetok logo."""
     top, mid = floor - h, x + w / 2
@@ -155,7 +162,7 @@ def closed_box(t, x, floor, w, h, label):
         f'{strokes(t, line=1)}/>'
         f'<rect x="{x:g}" y="{top:g}" width="{w:g}" height="{h:g}" rx="4" fill="{t["panel"]}" {strokes(t)}/>'
         f'<path d="M{mid - 9:g} {top:g}V{top + 12:g}H{mid + 9:g}V{top:g}" fill="{t["soft"]}" {strokes(t, line=1)}/>'
-        + plate(t, x + 18, top + 22, w - 36, label)
+        + label_plate(t, x, top, w, h, label)
         + logo(t, x + w - 21, floor - 21, 13, MAGENTA, NYETOK_N)
     )
 
@@ -175,8 +182,23 @@ def open_box(t, x, floor, w, h, label, contents):
         f'<path d="M{x + w:g} {top:g}L{br[0]:g} {br[1]:g}L{br[0] + 24:g} {br[1] - 5:g}L{x + w + 26:g} {top - 3:g}Z" '
         f'fill="{t["panel"]}" {s}/>'
         f'<rect x="{x:g}" y="{top:g}" width="{w:g}" height="{h:g}" rx="4" fill="{t["panel"]}" {s}/>'
-        + plate(t, x + 18, top + 22, w - 36, label)
+        + label_plate(t, x, top, w, h, label)
         + logo(t, x + w - 21, floor - 21, 13, MAGENTA, NYETOK_N)
+    )
+
+
+def mountain(t, cx, base):
+    """Gunung Kerinci in line, a volcano with a flag on top; `base` is where it sinks into the box."""
+    s = strokes(t)
+    peak = base - 46
+    return (
+        f'<path d="M{cx - 44:g} {base:g}L{cx - 9:g} {peak + 2:g}H{cx + 9:g}L{cx + 44:g} {base:g}Z" '
+        f'fill="{t["soft"]}" {s}/>'
+        f'<path d="M{cx - 9:g} {peak + 2:g}L{cx - 15:g} {peak + 12:g}L{cx - 6:g} {peak + 9:g}L{cx:g} {peak + 14:g}'
+        f'L{cx + 6:g} {peak + 9:g}L{cx + 15:g} {peak + 12:g}L{cx + 9:g} {peak + 2:g}" fill="{t["panel"]}" '
+        f'{strokes(t, line=1.2)}/>'
+        f'<path d="M{cx + 5:g} {peak + 2:g}V{peak - 13:g}" fill="none" {strokes(t, line=1.2)}/>'
+        f'<path d="M{cx + 5:g} {peak - 13:g}h10l-3 3.5 3 3.5h-10Z" fill="{MAGENTA}"/>'
     )
 
 
@@ -225,19 +247,20 @@ def banner(t):
                spacing=1.8)
         + text(57, 156, "Stocking up on small apps", size=44, fill=ink, weight=500, spacing=-1.76)
         + text(59, 204, "that are actually useful.", size=49, fill=ink, cls="serif", spacing=-0.4)
-        + text(60, 238, "Light, tidy and private apps for your Mac, free and open source.", size=16,
+        + text(60, 238, "Mac apps, browser games and agent tools. Free and open source.", size=16,
                fill=t["text2"])
     )
 
     # The recipe strip: what every app has, each set in a different face, like the strip on nyetok.id.
     recipe = [
-        ("Native Swift", dict(size=15, weight=600)),
-        ("MIT license", dict(size=14, cls="mono")),
+        ("Open source", dict(size=15, weight=600)),
+        ("MIT or Apache-2.0", dict(size=13, cls="mono")),
         ("free", dict(size=19, cls="serif")),
         ("NO ACCOUNT", dict(size=12, weight=700, spacing=1.6)),
-        ("No telemetry", dict(size=15, weight=500)),
+        ("Small & light", dict(size=15, weight=500)),
     ]
-    strip = text(60, 289, "SAME RECIPE, EVERY APP", size=11, fill=t["text3"], weight=600, cls="mono", spacing=1.6)
+    strip = text(60, 289, "SAME RECIPE, EVERY PROJECT", size=11, fill=t["text3"], weight=600, cls="mono",
+                 spacing=1.6)
 
     def extent(word, style):
         size, spacing = style["size"], style.get("spacing", 0)
@@ -248,7 +271,7 @@ def banner(t):
         return width(word, size, bold=style.get("weight", 400) >= 600, spacing=spacing)
 
     # Spread the words evenly between the label and the right rail's gutter, with a dot in each gap.
-    left, right = 336, 940
+    left, right = 300, 940
     sizes = [extent(word, style) for word, style in recipe]
     gap = (right - left - sum(sizes)) / (len(recipe) - 1)
     x = left
@@ -258,21 +281,22 @@ def banner(t):
             strip += f'<circle cx="{x + w + gap / 2:.1f}" cy="284.5" r="1.6" fill="{t["text3"]}" fill-opacity=".6"/>'
         x += w + gap
 
-    # The drawing: the apps in stock, standing on the bottom divider. Havus, the newest, pops out of the top box.
-    floor = foot
-    icon_x, icon_y = 702, 93
-    havus = (f'<g class="bob"><g transform="rotate(-10 {icon_x + 23} {icon_y + 23})">'
-             + logo(t, icon_x, icon_y, 46, HAVUS_INK, HAVUS_H, edge=True) + "</g></g>")
+    # The drawing: everything in stock, stacked in a pyramid on the bottom divider. The Mac apps sit at the bottom,
+    # the games and Namvan on top of them, and Gunung Kerinci, the newest, pokes out of the box at the summit.
+    floor, w, h, gap, step = foot, 104, 46, 6, 50
+    row = lambda i: [940 - (3 - i) * w - (2 - i) * gap - i * (w + gap) / 2 + k * (w + gap) for k in range(3 - i)]
+    bottom, middle, peak = row(0), row(1), row(2)
     sparkles = "".join(
         sparkle(cx, cy, r, MAGENTA, f' class="grow tw" style="animation-delay:{delay}s"')
-        for cx, cy, r, delay in [(776, 98, 7.5, 0), (667, 103, 4.6, 0.8), (824, 111, 3.6, 1.5)]
+        for cx, cy, r, delay in [(peak[0] + 12, 94, 6.5, 0), (peak[0] + w - 6, 100, 4.6, 0.8),
+                                 (peak[0] + w + 24, 120, 3.6, 1.5)]
     )
     art = (
-        closed_box(t, 612, floor, 110, 58, "XSPACE")
-        + closed_box(t, 728, floor, 110, 58, "JAMBUL")
-        + open_box(t, 670, floor - 62, 110, 58, "HAVUS", havus)
+        "".join(closed_box(t, x, floor, w, h, name) for x, name in zip(bottom, ("XSPACE", "JAMBUL", "HAVUS")))
+        + "".join(closed_box(t, x, floor - step, w, h, name) for x, name in zip(middle, ("KORUPSI", "NAMVAN")))
+        + open_box(t, peak[0], floor - 2 * step, w, h, "KERINCI",
+                   f'<g class="bob">{mountain(t, peak[0] + w / 2, floor - 2 * step - h + 4)}</g>')
         + sparkles
-        + next_box(t, 856, floor, 84, 48)
     )
 
     body = (
@@ -286,9 +310,9 @@ def banner(t):
         "@keyframes tw{0%,100%{opacity:.3;transform:scale(.55)}50%{opacity:1;transform:scale(1)}}"
         ".tw{animation:tw 2.8s ease-in-out infinite both}"
     )
-    alt = ("Nyetok: stocking up on small apps that are actually useful. Light, tidy and private apps for your Mac, "
-           "free and open source, made in Indonesia. The same recipe in every app: native Swift, MIT license, free, "
-           "no account, no telemetry. nyetok.id")
+    alt = ("Nyetok: stocking up on small apps that are actually useful. Mac apps, browser games and agent tools, "
+           "free and open source, made in Indonesia. The same recipe in every project: open source under MIT or "
+           "Apache-2.0, free, no account, small and light. nyetok.id")
     return svg(W, H, alt, body, defs, css)
 
 
@@ -316,6 +340,7 @@ ASSETS = {
     "banner": banner,
     "btn-havus": lambda t: button(t, "Try Havus", primary=True),
     "btn-korupsi": lambda t: button(t, "Play Korupsi"),
+    "btn-kerinci": lambda t: button(t, "Play Jelajah Kerinci"),
     "btn-support": lambda t: button(t, "Support Nyetok"),
 }
 
