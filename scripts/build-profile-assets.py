@@ -247,14 +247,13 @@ def banner(t):
                spacing=1.8)
         + text(57, 156, "Stocking up on small apps", size=44, fill=ink, weight=500, spacing=-1.76)
         + text(59, 204, "that are actually useful.", size=49, fill=ink, cls="serif", spacing=-0.4)
-        + text(60, 238, "Mac apps, browser games and agent tools. Free and open source.", size=16,
-               fill=t["text2"])
+        + text(60, 238, "Mac apps and browser games. Free and open source.", size=16, fill=t["text2"])
     )
 
     # The recipe strip: what every app has, each set in a different face, like the strip on nyetok.id.
     recipe = [
         ("Open source", dict(size=15, weight=600)),
-        ("MIT or Apache-2.0", dict(size=13, cls="mono")),
+        ("MIT license", dict(size=14, cls="mono")),
         ("free", dict(size=19, cls="serif")),
         ("NO ACCOUNT", dict(size=12, weight=700, spacing=1.6)),
         ("Small & light", dict(size=15, weight=500)),
@@ -281,23 +280,25 @@ def banner(t):
             strip += f'<circle cx="{x + w + gap / 2:.1f}" cy="284.5" r="1.6" fill="{t["text3"]}" fill-opacity=".6"/>'
         x += w + gap
 
-    # The drawing: everything in stock, stacked in a pyramid on the bottom divider. The Mac apps and an empty box for
-    # the next one sit at the bottom, the games and Namvan on top of them, and Gunung Kerinci, the newest, pokes out of
-    # the box at the summit.
-    floor, w, h, gap, step = foot, 104, 46, 6, 50
-    row = lambda i: [940 - (3 - i) * w - (2 - i) * gap - i * (w + gap) / 2 + k * (w + gap) for k in range(3 - i)]
-    bottom, middle, peak = row(0), row(1), row(2)
+    # The drawing: everything in stock, stacked on the bottom divider. The Mac apps and an empty box for the next one
+    # sit at the bottom, and the two games on top of them. Gunung Kerinci, the newest, pokes out of its open box; the
+    # top row stands a flap's width further apart than the boxes below, so the flaps have room.
+    floor, w, h, gap, step, flap = foot, 104, 46, 6, 50, 26
+    bottom = [940 - 3 * w - 2 * gap + k * (w + gap) for k in range(3)]
+    middle = [bottom[1] - (w + gap + flap) / 2 + k * (w + gap + flap) for k in range(2)]
+    lid = floor - step - h  # the top row's upper edge
+    kerinci = middle[1]
     sparkles = "".join(
         sparkle(cx, cy, r, MAGENTA, f' class="grow tw" style="animation-delay:{delay}s"')
-        for cx, cy, r, delay in [(peak[0] + 12, 94, 6.5, 0), (peak[0] + w - 6, 100, 4.6, 0.8),
-                                 (peak[0] + w + 24, 120, 3.6, 1.5)]
+        for cx, cy, r, delay in [(kerinci + 12, lid - 16, 6.5, 0), (kerinci + w - 6, lid - 10, 4.6, 0.8),
+                                 (kerinci + w + 24, lid + 10, 3.6, 1.5)]
     )
     art = (
         "".join(closed_box(t, x, floor, w, h, name) for x, name in zip(bottom, ("JAMBUL", "HAVUS")))
         + next_box(t, bottom[2], floor, w, h)
-        + "".join(closed_box(t, x, floor - step, w, h, name) for x, name in zip(middle, ("KORUPSI", "NAMVAN")))
-        + open_box(t, peak[0], floor - 2 * step, w, h, "KERINCI",
-                   f'<g class="bob">{mountain(t, peak[0] + w / 2, floor - 2 * step - h + 4)}</g>')
+        + closed_box(t, middle[0], floor - step, w, h, "KORUPSI")
+        + open_box(t, kerinci, floor - step, w, h, "KERINCI",
+                   f'<g class="bob">{mountain(t, kerinci + w / 2, lid + 4)}</g>')
         + sparkles
     )
 
@@ -312,9 +313,9 @@ def banner(t):
         "@keyframes tw{0%,100%{opacity:.3;transform:scale(.55)}50%{opacity:1;transform:scale(1)}}"
         ".tw{animation:tw 2.8s ease-in-out infinite both}"
     )
-    alt = ("Nyetok: stocking up on small apps that are actually useful. Mac apps, browser games and agent tools, "
-           "free and open source, made in Indonesia. The same recipe in every project: open source under MIT or "
-           "Apache-2.0, free, no account, small and light. nyetok.id")
+    alt = ("Nyetok: stocking up on small apps that are actually useful. Mac apps and browser games, free and open "
+           "source, made in Indonesia. The same recipe in every project: open source under the MIT license, free, no "
+           "account, small and light. nyetok.id")
     return svg(W, H, alt, body, defs, css)
 
 
