@@ -281,8 +281,9 @@ def banner(t):
             strip += f'<circle cx="{x + w + gap / 2:.1f}" cy="284.5" r="1.6" fill="{t["text3"]}" fill-opacity=".6"/>'
         x += w + gap
 
-    # The drawing: everything in stock, stacked in a pyramid on the bottom divider. The Mac apps sit at the bottom,
-    # the games and Namvan on top of them, and Gunung Kerinci, the newest, pokes out of the box at the summit.
+    # The drawing: everything in stock, stacked in a pyramid on the bottom divider. The Mac apps and an empty box for
+    # the next one sit at the bottom, the games and Namvan on top of them, and Gunung Kerinci, the newest, pokes out of
+    # the box at the summit.
     floor, w, h, gap, step = foot, 104, 46, 6, 50
     row = lambda i: [940 - (3 - i) * w - (2 - i) * gap - i * (w + gap) / 2 + k * (w + gap) for k in range(3 - i)]
     bottom, middle, peak = row(0), row(1), row(2)
@@ -292,7 +293,8 @@ def banner(t):
                                  (peak[0] + w + 24, 120, 3.6, 1.5)]
     )
     art = (
-        "".join(closed_box(t, x, floor, w, h, name) for x, name in zip(bottom, ("XSPACE", "JAMBUL", "HAVUS")))
+        "".join(closed_box(t, x, floor, w, h, name) for x, name in zip(bottom, ("JAMBUL", "HAVUS")))
+        + next_box(t, bottom[2], floor, w, h)
         + "".join(closed_box(t, x, floor - step, w, h, name) for x, name in zip(middle, ("KORUPSI", "NAMVAN")))
         + open_box(t, peak[0], floor - 2 * step, w, h, "KERINCI",
                    f'<g class="bob">{mountain(t, peak[0] + w / 2, floor - 2 * step - h + 4)}</g>')

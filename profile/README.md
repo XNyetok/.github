@@ -15,7 +15,6 @@ Each one is written in Swift on Apple's own frameworks, with no Electron, no acc
 | App | What it does | Requires | Download |
 | --- | --- | --- | --- |
 | [Havus](https://github.com/XNyetok/Havus)<br><sub>[havus.web.id](https://havus.web.id)</sub> | A Mac cleaner that minds its own business: caches, logs and developer junk, apps with their leftovers, large files you rarely open, a map of what fills your disk, and programs that start on their own. Everything goes to the Trash first | macOS&nbsp;14+ | [Latest&nbsp;release](https://github.com/XNyetok/Havus/releases/latest) |
-| [XSpace](https://github.com/XNyetok/XSpace) | Several isolated browser profiles in one window, each with its own cookies and logins. Panes in a grid of your choice, a start page with shortcuts, and pages that zoom to fit a small pane | macOS&nbsp;26+ | [Latest&nbsp;release](https://github.com/XNyetok/XSpace/releases/latest) |
 | [Jambul](https://github.com/XNyetok/Jambul) | A Dynamic Island for the MacBook notch, with a timer, Keep Awake, battery peeks and your Claude, Antigravity and Codex usage limits, all on one Home tab | macOS&nbsp;14+ | [Latest&nbsp;release](https://github.com/XNyetok/Jambul/releases/latest) |
 
 These releases aren't notarized by Apple yet, so macOS blocks each app the first time it opens. Open the app once,
